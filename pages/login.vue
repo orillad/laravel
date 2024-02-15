@@ -6,6 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 
 definePageMeta({
   layout: "centered",
+  middleware: ["guests"]
 });
 
 interface formData {
@@ -25,8 +26,6 @@ async function handleSubmit() {
   console.log(form.value.email);
 
   console.log(form);
-
-
   // const res = await axios.post("/login", {
   //   email: form.value.email,
   //   password: form.value.password,
@@ -36,16 +35,18 @@ async function handleSubmit() {
     password: form.value.password
   }
 
-  async function login(req: any) {
-    try {
-      let res = await axios.post('/login', req);
-      await router.push("/me");
-      return res.data; // or any other value you want to return
-    } catch (error) {
-      console.log(error.response);
-      return error.response.data;
-    }
-  }
+  // async function login(req: any) {
+  //   try {
+  //     let res = await axios.post('/login', req);
+  //     await router.push("/me");
+  //     return res.data; // or any other value you want to return
+  //   } catch (error: any) {
+  //     console.log(error.response);
+  //     return error.response.data;
+  //   }
+  // }
+
+  const {login} = useAuth();
 
   login(data)
 

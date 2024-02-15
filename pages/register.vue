@@ -25,6 +25,7 @@ const errors = ref<formData>({
 
 definePageMeta({
   layout: "centered",
+  middleware: ["guests"],
 });
 
 watch(form.value, () => {
@@ -56,23 +57,20 @@ async function handleSubmit() {
   }
   if (someErr) return
 
-  // async function register(payload: RegisterPayload) {
-  //   const res = await axios.post("/api/register", payload)
-  //   console.log(res)
-  // }
-
   console.log(form);
 
 
-  const res = await axios.post("/register", {
+const data = {
     name: form.value.name,
     email: form.value.email,
     password: form.value.password,
     password_confirmation: form.value.password2
 
-  })
+  }
 
+  const {register}=useAuth()
 
+  register(data);
 }
 
 </script>
