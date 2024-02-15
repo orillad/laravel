@@ -12,6 +12,7 @@ export const useAuth = () => {
     }
 
     async function logout() {
+        user.value=null
         await axios.post('/logout');
         useRouter().push('/login')
     }
