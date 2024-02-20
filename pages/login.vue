@@ -11,22 +11,7 @@ definePageMeta({
   middleware: ["guests"]
 });
 
-interface FormData {
-  email: string;
-  password: string;
-}
-
-
-const router = useRouter();
-const errors = ref({
-  email: [],
-  password: []
-})
-
-
 const { login } = useAuth();
-
-
 
 
 async function handleLogin(payload: LoginPayload, node?:FormKitNode) {

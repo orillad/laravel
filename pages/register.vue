@@ -1,116 +1,41 @@
 <script setup lang="ts">
 import { watch, ref } from "vue"
 import axios from "axios"
+import { RegisterPaylaod } from "~~/types";
+import { FormKitNode } from "@formkit/core";
+import { FormKit } from "@formkit/vue";
 
-interface formData {
-  name: string;
-  email: string;
-  password: string;
-  password2: string;
-}
-
-const form = ref<formData>({
-  name: "",
-  email: "",
-  password: "",
-  password2: "",
-})
-
-const errors = ref<formData>({
-  name: "",
-  email: "",
-  password: "",
-  password2: "",
-})
 
 definePageMeta({
   layout: "centered",
   middleware: ["guests"],
 });
 
-watch(form.value, () => {
-  errors.value.name = ""
-  errors.value.email = ""
-  errors.value.password = ""
-  errors.value.password2 = ""
-})
+const { register } = useAuth();
 
 
-async function handleSubmit() {
-  let someErr = false
-  if (form.value.name.length <= 0) {
-    errors.value.name = "Campo obligatorio"
-    someErr = true
+async function handleRegister(payload: RegisterPaylaod, node?:FormKitNode) {
+  console.log(payload);
+  
+  try{
+    await register(payload)
+  }catch(error){
+    handleInvalitdForm(error, node)
   }
-  if (form.value.email.length <= 0) {
-    errors.value.email = "Campo obligatorio"
-    someErr = true
-  }
-  if (form.value.password.length <= 0) {
-    errors.value.password = "Campo obligatorio"
-    someErr = true
-  }
-
-  if (form.value.password !== form.value.password2) {
-    errors.value.password2 = "No coinciden"
-    someErr = true
-  }
-  if (someErr) return
-
-  console.log(form);
-
-
-const data = {
-    name: form.value.name,
-    email: form.value.email,
-    password: form.value.password,
-    password_confirmation: form.value.password2
-
-  }
-
-  const {register}=useAuth()
-
-  register(data);
+  
 }
+
 
 </script>
 <template>
   <div class="register">
     <h1>Register</h1>
-    <form @submit.prevent="handleSubmit()">
-      <label>
-        <div>Name</div>
-        <input v-model="form.name" type="text" />
-        <span class="error" v-if="errors.name">{{ errors.name }}</span>
-
-      </label>
-
-      <label>
-        <div>Email</div>
-        <input v-model="form.email" type="email" />
-        <span class="error" v-if="errors.email">{{ errors.email }}</span>
-
-
-      </label>
-
-      <label>
-        <div>Password</div>
-        <input v-model="form.password" type="password" />
-        <span class="error" v-if="errors.password">{{ errors.password }}</span>
-
-
-      </label>
-
-      <label>
-        <div>Confirm Password</div>
-        <input v-model="form.password2" type="password" />
-        <span class="error" v-if="errors.password2">{{ errors.password2 }}</span>
-
-
-      </label>
-
-      <button class="btn">Register</button>
-    </form>
+    <FormKit type="form" submit-label="Register" @submit="handleRegister">
+      <FormKit label="Name" name="name" type="text"/>
+      <FormKit label="Email" name="email" type="email"/>
+      <FormKit label="Password" name="password" type="password"/>
+      <FormKit label="Confirm password" name="password_confirmation" type="password"/>
+    </FormKit>
 
     <p>
       Already have an account?
