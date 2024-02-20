@@ -1,84 +1,60 @@
 <script setup lang="ts">
 import { watch, ref } from "vue"
-import axios, { Axios } from "axios"
+import axios, { Axios, AxiosError } from "axios"
 import { useRoute, useRouter } from "vue-router";
-
+import { LoginPayload } from "~~/types";
+import type {FormKitNode} from "@formkit/core"
+import { FormKit } from "@formkit/vue";
 
 definePageMeta({
   layout: "centered",
   middleware: ["guests"]
 });
 
-interface formData {
+interface FormData {
   email: string;
   password: string;
 }
 
-const form = ref<formData>({
-  email: "",
-  password: "",
-})
 
 const router = useRouter();
+const errors = ref({
+  email: [],
+  password: []
+})
 
-async function handleSubmit() {
 
-  console.log(form.value.email);
+const { login } = useAuth();
 
-  console.log(form);
-  // const res = await axios.post("/login", {
-  //   email: form.value.email,
-  //   password: form.value.password,
-  // })
-  const data = {
-    email: form.value.email,
-    password: form.value.password
+
+
+
+async function handleLogin(payload: LoginPayload, node?:FormKitNode) {
+  try{
+    await login(payload)
+  }catch(error){
+    handleInvalitdForm(error, node)
   }
-
-  // async function login(req: any) {
-  //   try {
-  //     let res = await axios.post('/login', req);
-  //     await router.push("/me");
-  //     return res.data; // or any other value you want to return
-  //   } catch (error: any) {
-  //     console.log(error.response);
-  //     return error.response.data;
-  //   }
-  // }
-
-  const {login} = useAuth();
-
-  login(data)
-
-
-  // if (res.data.success) {
-  //   await router.push("/me");
-  // } else {
-  //   console.error("Login failed");
-  // }
-
+  
 }
 
 </script>
 <template>
   <div class="login">
     <h1>Login</h1>
-    <form @submit.prevent="handleSubmit">
-      <label>
-        <div>Email</div>
-        <input v-model="form.email" type="text" />
-      </label>
-
-      <label>
-        <div>Password</div>
-        <input v-model="form.password" type="password" />
-      </label>
-      <button class="btn">Login</button>
-    </form>
-
+    <FormKit type="form" submit-label="login" @submit="handleLogin">
+      <FormKit label="Email" name="email" type="email"/>
+      <FormKit label="Password" name="password" type="password"/>
+    </FormKit>
     <p>
       Don't have an account?
       <NuxtLink class="underline text-lime-600" to="/register">Register now!</NuxtLink>
     </p>
   </div>
 </template>
+<style scoped>
+.error {
+  color: red;
+  margin-top: 5px;
+}
+</style>

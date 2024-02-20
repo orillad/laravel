@@ -1,4 +1,5 @@
 <template>
+  <title>LINKS</title>
   <div>
     <NuxtLayout>
       <NuxtPage></NuxtPage>
