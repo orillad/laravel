@@ -2,7 +2,7 @@
 import { watch, ref } from "vue"
 import axios, { Axios, AxiosError } from "axios"
 import { useRoute, useRouter } from "vue-router";
-import { LoginPayload } from "~~/types";
+import type { LoginPayload } from "~~/types";
 import type {FormKitNode} from "@formkit/core"
 import { FormKit } from "@formkit/vue";
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { watch, ref } from "vue"
 import axios from "axios"
-import { RegisterPaylaod } from "~~/types";
-import { FormKitNode } from "@formkit/core";
+import type { RegisterPaylaod } from "~~/types";
+import type { FormKitNode } from "@formkit/core";
 import { FormKit } from "@formkit/vue";
 
 
