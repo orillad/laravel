@@ -1,30 +1,34 @@
 <script setup lang="ts">
 import axios from 'axios';
+import type { Links } from '~/types';
+import { ref } from 'vue';
 
 axios.get("/links")
 definePageMeta({
   middleware:["auth"],
 });
-const links = [
-  {
-    short_link: "234jlsfsf",
-    full_link: "https://vueschool.io",
-    views: 3,
-    id: 1,
-  },
-  {
-    short_link: "adfaowerw",
-    full_link: "https://google.com",
-    views: 1,
-    id: 2,
-  },
-  {
-    short_link: "234sfdjaip",
-    full_link: "https://vuejsnation.com/",
-    views: 0,
-    id: 3,
-  },
-];
+
+const links = ref<Links[]>([]);
+const pagination = ref({
+  currentPage: 1,
+  totalPages: 1,
+  pageSize: 10 
+});
+
+async function fetchData(page: number) {
+  try{
+    const response = await axios.get("/links");
+    links.value = response.data.data;
+    pagination.value.currentPage = response.data.currentPage;
+    pagination.value.totalPages = response.data.totalPages;
+    pagination.value.pageSize = response.data.pageSize;
+  } catch(error){
+    console.log(error);
+  }
+}
+
+fetchData(1)
+
 </script>
 <template>
   <div>
