@@ -6,30 +6,27 @@ import type { Links } from '~/types';
 
 axios.get("/links")
 definePageMeta({
-  middleware:["auth"],
+  middleware: ["auth"],
 });
-const links = ref([<Links>{}]);
-const page = ref(1);
 
-const fetchLinks = () => {
-  axios.get(`/api/links?page=${page.value}`)
-    .then(response => {
-      links.value = response.data.data;
-    })
-    .catch(error => {
-      console.error('Error fetching links:', error);
-    });
-};
+const data = ref({})
+const links = ref<Array<Links>>([])
+const page = ref<number>(1)
 
-const onPageChange = (newPage: number) => {
-  page.value = newPage;
-};
+
+const getLinks = async () => {
+  const linksResponse = await axios.get(`/links?page=${page.value}`)
+  console.log(linksResponse.data);
+
+  data.value = linksResponse.data
+  links.value = linksResponse.data.data
+}
+getLinks()
 
 watch(page, () => {
-  fetchLinks();
-});
+  getLinks()
+})
 
-fetchLinks();
 </script>
 <template>
   <div>
@@ -53,51 +50,48 @@ fetchLinks();
             <th class="w-[10%]">Edit</th>
             <th class="w-[10%]">Trash</th>
             <th class="w-[6%] text-center">
-              <button><IconRefresh /></button>
+              <button>
+                <IconRefresh />
+              </button>
             </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="link in links">
             <td>
-              <a :href="link.full_link" target="_blank">
-                {{ link.full_link.replace(/^http(s?):\/\//, "") }}</a
-              >
+              <a v-if="link.full_link" :href="link.full_link" target="_blank">
+                {{ link.full_link.replace(/^http(s?):\/\//, "") }}
+              </a>
             </td>
             <td>
-              <a
-                :href="`${useRuntimeConfig().public.appURL}/${link.short_link}`"
-                target="_blank"
-              >
+              <a v-if="link.full_link && link.short_link" :href="`${useRuntimeConfig().public.appURL}/${link.short_link}`"
+                target="_blank">
                 {{
-                  useRuntimeConfig().public.appURL.replace(
-                    /^http(s?):\/\//,
-                    ""
-                  )
+                  useRuntimeConfig().public.appURL.replace(/^http(s?):\/\//, "")
                 }}/{{ link.short_link }}
               </a>
             </td>
             <td>{{ link.views }}</td>
             <td>
-              <NuxtLink class="no-underline" :to="`/links/${link.id}`"
-                ><iconEdit
-              /></NuxtLink>
+              <NuxtLink class="no-underline" :to="`/links/${link.id}`">
+                <iconEdit />
+              </NuxtLink>
             </td>
             <td>
-              <button><IconTrash /></button>
+              <button>
+                <IconTrash />
+              </button>
             </td>
             <td></td>
           </tr>
         </tbody>
       </table>
+      <TailwindPagination :data="data" @pagination-change-page="page = $event" />
       <div class="mt-5 flex justify-center"></div>
     </div>
 
     <!-- No links message for when table is empty -->
-    <div
-      v-else
-      class="border-dashed border-gray-500 p-3 border-[1px] text-center"
-    >
+    <div v-else class="border-dashed border-gray-500 p-3 border-[1px] text-center">
       <div class="flex justify-center">
         <IconLink />
       </div>
@@ -108,9 +102,7 @@ fetchLinks();
         <!-- Show this if reason for no links is User has none -->
         <span v-else>
           No links created yet
-          <NuxtLink to="/links/create" class="text-green-600"
-            >Go create your first link!</NuxtLink
-          >
+          <NuxtLink to="/links/create" class="text-green-600">Go create your first link!</NuxtLink>
         </span>
       </p>
     </div>
