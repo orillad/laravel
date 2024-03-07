@@ -1,34 +1,35 @@
 <script setup lang="ts">
 import axios from 'axios';
+import { ref, watch } from 'vue';
+import { TailwindPagination } from 'laravel-vue-pagination';
 import type { Links } from '~/types';
-import { ref } from 'vue';
 
 axios.get("/links")
 definePageMeta({
   middleware:["auth"],
 });
+const links = ref([<Links>{}]);
+const page = ref(1);
 
-const links = ref<Links[]>([]);
-const pagination = ref({
-  currentPage: 1,
-  totalPages: 1,
-  pageSize: 10 
+const fetchLinks = () => {
+  axios.get(`/api/links?page=${page.value}`)
+    .then(response => {
+      links.value = response.data.data;
+    })
+    .catch(error => {
+      console.error('Error fetching links:', error);
+    });
+};
+
+const onPageChange = (newPage: number) => {
+  page.value = newPage;
+};
+
+watch(page, () => {
+  fetchLinks();
 });
 
-async function fetchData(page: number) {
-  try{
-    const response = await axios.get("/links");
-    links.value = response.data.data;
-    pagination.value.currentPage = response.data.currentPage;
-    pagination.value.totalPages = response.data.totalPages;
-    pagination.value.pageSize = response.data.pageSize;
-  } catch(error){
-    console.log(error);
-  }
-}
-
-fetchData(1)
-
+fetchLinks();
 </script>
 <template>
   <div>
