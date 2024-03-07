@@ -11,21 +11,25 @@ definePageMeta({
 
 const data = ref({})
 const links = ref<Array<Links>>([])
-const page = ref<number>(1)
-
+const page = ref((useRoute().query.page as string) || "1");
+const search = ref('');
 
 const getLinks = async () => {
-  const linksResponse = await axios.get(`/links?page=${page.value}`)
+  const linksResponse = await axios.get(`/links?page=${page.value}&filter=${search.value}`)
   console.log(linksResponse.data);
 
   data.value = linksResponse.data
   links.value = linksResponse.data.data
 }
 getLinks()
+const router = useRouter();  
+watch([page, search], () => {
+  router.replace({
+    query: { ...useRoute().query, page: page.value, search: search.value },
+  }).catch(() => {});
 
-watch(page, () => {
-  getLinks()
-})
+  getLinks();
+});
 
 </script>
 <template>
