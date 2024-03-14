@@ -23,30 +23,30 @@ export interface RegisterPaylaod {
 }
 
 export interface Links {
-    id: number
-    created_at: Date;
-    updated_at: Date;
+    id: string;
+    created_at: Date | null;
+    updated_at: Date | null;
     short_link: string;
     full_link: string;
-    views: string
-}
-
-export interface ErrorResponse {
+    views: number;
+  }
+  
+  export interface ErrorResponse {
     message: string;
     errors: Record<string, string[]>;
-}
-
-export interface PaginateResponse<T> {
-    current_page: number;
+  }
+  
+  export interface PaginateResponse<T> {
+    current_number: number;
     data: T[];
     first_page_url: string | null;
     from: number;
     last_page: number;
     last_page_url: string | null;
     links: {
-        url: string | null;
-        label: string;
-        active: boolean;
+      url: string | null;
+      label: string;
+      active: boolean;
     }[];
     next_page_url: string | null;
     path: string;
@@ -54,4 +54,4 @@ export interface PaginateResponse<T> {
     prev_page_url: string | null;
     to: number;
     total: number;
-}
+  }
